@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://lich-truc-na-ri-api.workers.dev/api/$1"
+      "destination": "https://lich-truc-na-ri.pages.dev/api/$1"
     },
     {
       "source": "/((?!api/).*)",
