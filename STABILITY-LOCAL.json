@@ -1,0 +1,48 @@
+{
+  "environment": "local workerd/D1/DO only",
+  "at": "2026-11-04T08:39:36.894Z",
+  "accounts": 50,
+  "shifts": 730,
+  "httpRequests": 1050,
+  "readMs": {
+    "count": 680,
+    "p50": 1518,
+    "p95": 1677,
+    "max": 1717
+  },
+  "writeMs": {
+    "count": 3,
+    "p50": 104,
+    "p95": 143,
+    "max": 143
+  },
+  "heartbeatMs": {
+    "count": 50,
+    "p50": 196,
+    "p95": 197,
+    "max": 198
+  },
+  "realtimeAfterHttpResponseMs": {
+    "count": 50,
+    "p50": 0,
+    "p95": 0,
+    "max": 0
+  },
+  "realtimeFromRequestStartMs": {
+    "count": 50,
+    "p50": 47,
+    "p95": 47,
+    "max": 47
+  },
+  "unexpectedFailures": [],
+  "unexpectedSocketClosures": [],
+  "concurrentSaves": {
+    "committed": 1,
+    "conflicts": 9
+  },
+  "connections": {
+    "accepted": 150,
+    "overflowStatus": 429
+  },
+  "productionDataTouched": false
+}

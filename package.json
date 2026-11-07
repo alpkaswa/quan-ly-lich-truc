@@ -1,0 +1,50 @@
+{
+  "name": "lich-truc-quan-sinh-na-ri",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port=3000 --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "node scripts/clean.mjs",
+    "lint": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs",
+    "typecheck": "tsc --noEmit",
+    "api:dev": "wrangler dev",
+    "db:local": "wrangler d1 migrations apply DB --local",
+    "api:deploy": "wrangler deploy",
+    "pages:deploy": "npm run build && wrangler --cwd pages pages deploy ../dist --branch main",
+    "build:worker": "vite build --config worker/vite.config.mjs",
+    "check": "npm run typecheck && npm test && npm run build && npm run build:worker",
+    "integration:prepare": "node scripts/integration-local.mjs --prepare && wrangler d1 migrations apply DB --local --persist-to .wrangler/integration-20261103 && wrangler d1 execute DB --local --persist-to .wrangler/integration-20261103 --file .wrangler/integration-20261103/seed.sql --json",
+    "integration:server": "wrangler dev --port 8791 --persist-to .wrangler/integration-20261103 --log-level warn",
+    "integration:test": "node scripts/integration-local.mjs && node scripts/integration-client.mjs && node scripts/integration-restore.mjs",
+    "integration": "node scripts/integration-security.mjs && npm run integration:test && node scripts/integration-roles.mjs"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "jose": "^6.2.15",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "vite": "^8.3.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261102.1",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/ws": "^8.18.2",
+    "autoprefixer": "^10.4.21",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.156.1",
+    "ws": "^8.22.1"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "lich-truc-na-ri",
+  "pages_build_output_dir": "../dist",
+  "compatibility_date": "2026-11-01",
+  "services": [{"binding":"API","service":"lich-truc-na-ri-api"}]
+}

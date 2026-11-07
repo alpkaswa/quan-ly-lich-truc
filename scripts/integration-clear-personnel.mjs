@@ -1,0 +1,23 @@
+// Run only against isolated LOCAL fixtures. No production host or --remote option exists here.
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const fixture=JSON.parse(readFileSync('.wrangler/integration-20261103/sessions.json','utf8'));const {users}=fixture;
+const request=async(i,path,method='GET',body)=>{const u=users[i];const r=await fetch('http://127.0.0.1:8791/api'+path,{method,headers:{Origin:'http://localhost:3000',Cookie:`duty_session=${u.raw}; duty_csrf=${u.csrf}`,'X-CSRF-Token':u.csrf,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(15000)});return {status:r.status,data:await r.json()};};
+let checks=0;const check=(ok,label)=>{assert.ok(ok,label);checks++;console.log('PASS',label);};
+check((await request(1,'/leaves','POST',{date:fixture.day,reason:'local deletion test'})).status===200,'fixture personnel leave created');
+check((await request(1,'/swaps','POST',{shiftDate:fixture.shifts[0].date,targetEmployeeId:'it-e2',targetShiftDate:fixture.shifts[1].date,reason:'local deletion test'})).status===200,'fixture linked swap request created');
+const initial=(await request(0,'/state')).data;initial.data.shifts[0].isLocked=true;assert.equal((await request(0,'/state','PUT',{expectedRevision:initial.revision,data:initial.data})).status,200);
+let preview=await request(0,'/personnel/delete-all/check');check(preview.status===200&&!preview.data.canDelete,'related schedule blocks bulk deletion preview');
+check((await request(1,'/personnel/delete-all/check')).status===403,'staff cannot preview bulk deletion');
+const data={expectedRevision:preview.data.revision,confirm:'XOA TAT CA NHAN SU'};
+check((await request(1,'/personnel/delete-all','POST',data)).status===403,'staff cannot delete personnel');
+check((await request(0,'/personnel/delete-all','POST',{...data,confirm:'wrong'})).status===400,'typed confirmation required');
+check((await request(0,'/personnel/delete-all','POST',{...data,expectedRevision:-1})).status===409,'stale revision blocked');
+check((await request(0,'/personnel/delete-all','POST',data)).status===409,'server blocks deletion when schedules are linked');
+check((await request(0,'/state')).data.data.employees.length===preview.data.count,'blocked deletion preserves personnel');
+const accountsBefore=(await request(0,'/accounts')).data;
+const result=await request(0,'/personnel/delete-all','POST',{confirm:data.confirm,expectedRevision:preview.data.revision,deleteRelated:true});check(result.status===200&&result.data.count===preview.data.count&&Boolean(result.data.safetyBackup),'all personnel removed with signed safety backup');
+const state=(await request(0,'/state')).data.data;check(state.employees.length===0,'shared roster is empty after deletion');check(state.shifts.length>0&&state.shifts.every(s=>!s.teacher1Id&&!s.teacher2Id&&!s.adminId&&!s.guardId&&s.status==='INCOMPLETE'),'explicitly confirmed cascade clears assignments while retaining dates');check(state.unavailableDates.length===0&&state.requests.length===0,'explicitly confirmed cascade removes personnel-linked leaves and requests');check(state.shifts.find(s=>s.id===fixture.shifts[0].id).isLocked,'cascade retains original shift locks');
+const after=(await request(0,'/accounts')).data;check(after.length===accountsBefore.length&&after.every(a=>a.employeeId===null),'Google accounts preserved and personnel references detached');
+check((await request(1,'/auth/session')).status===403,'unlinked staff cannot use the previous session after clearing roster');
+console.log(JSON.stringify({localBulkDeletion:'PASS',checks,productionDataTouched:false}));

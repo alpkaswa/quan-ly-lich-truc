@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lich-truc-na-ri-api",
+  "main": "worker-build/index.mjs",
+  "no_bundle": true,
+  "build": {"command":"npm run build:worker"},
+  "tsconfig": "worker/tsconfig.json",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "vars": { "MONITOR_ACCOUNT_ID":"32765095d106a7d9826d8c176f3ec9c8", "MONITOR_DATABASE_ID":"d1ee1cd7-1d67-4faa-8121-09376513f059", "APP_ORIGIN": "https://lich-truc-na-ri.pages.dev", "ALLOW_LOCAL_HTTP": "false", "ADMIN_GOOGLE_EMAIL": "nghiapipi123@gmail.com", "GOOGLE_CLIENT_ID": "43585717168-k9l6h7i4bdffvurq9ag1hqicelsb7l1g.apps.googleusercontent.com" },
+  "d1_databases": [{ "binding": "DB", "database_name": "lich-truc-na-ri", "database_id": "d1ee1cd7-1d67-4faa-8121-09376513f059", "migrations_dir": "migrations" }],
+  "durable_objects": { "bindings": [{ "name": "ROOM", "class_name": "ScheduleRoom" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ScheduleRoom"] }],
+  "r2_buckets": [{"binding":"BACKUPS","bucket_name":"lich-truc-na-ri-backups"}],
+  "triggers": { "crons": ["0 19 * * *"] },
+  "observability": { "enabled": true, "head_sampling_rate": 0.1 }
+}

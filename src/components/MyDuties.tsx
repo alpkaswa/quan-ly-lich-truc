@@ -1,0 +1,21 @@
+import React,{useState} from 'react';
+import type {Employee,ShiftAssignment} from '../types';
+import {dutiesForEmployee,findDutyEmployees,dutyPositions} from '../services/dutyLookup';
+import {useRealTimeClock} from '../hooks/useRealTimeClock';
+import {dayOffset} from '../services/schoolTime';
+export function MyDuties({employees,shifts,employeeId=null,personal=false,initialEmployeeId=null}:{employees:Employee[];shifts:ShiftAssignment[];employeeId?:string|null;personal?:boolean;initialEmployeeId?:string|null}){
+ const [query,setQuery]=useState(''),[selected,setSelected]=useState<string|null>(initialEmployeeId),[date,setDate]=useState(''),[scope,setScope]=useState(personal?'UPCOMING':'ALL');
+ const {currentDutyDate}=useRealTimeClock();
+ const chosenId=personal?employeeId:selected,employee=employees.find(e=>e.id===chosenId),matches=findDutyEmployees(employees,query);
+ const rows=dutiesForEmployee(shifts,chosenId,{date,fromDate:scope==='UPCOMING'&&!date?currentDutyDate:''});
+ const names=new Map(employees.map(e=>[e.id,e.name]));
+ const formatDate=(value:string)=>value.split('-').reverse().join('/');
+ return <section className="space-y-4"><h1 className="text-2xl font-bold">{personal?'Ca trực của tôi':'Tìm tên & Ca trực'}</h1>
+ {!personal&&<div className="panel space-y-3"><label className="block font-medium">Tìm nhân viên<input className="field" type="search" placeholder="Nhập tên, mã nhân sự hoặc số điện thoại" value={query} onChange={e=>{setQuery(e.target.value);setSelected(null);}}/></label><p className="text-sm text-slate-500">Bấm vào tên để xem ngày và vị trí trực. Có thể tìm tên không dấu.</p><div className="flex flex-wrap gap-2 max-h-48 overflow-auto" aria-label="Kết quả tìm nhân viên">{matches.map(e=><button type="button" key={e.id} aria-pressed={selected===e.id} className={`action ${selected===e.id?'':'secondary'}`} onClick={()=>setSelected(e.id)}>{e.name} · {e.code}</button>)}{!matches.length&&<p>Không tìm thấy nhân viên phù hợp.</p>}</div></div>}
+ {personal&&!employee&&<div className="panel"><p>Chưa tìm thấy hồ sơ nhân sự có email trùng tài khoản Google của bạn, nên chưa xác định được ca trực cá nhân.</p><p className="mt-2 text-sm text-slate-500">Email trong hồ sơ nhân sự cần trùng email Google. Bạn vẫn xem được lịch chung và tìm ca theo tên trong mục Tìm ca trực.</p></div>}
+ {employee&&<><div className="panel space-y-3"><h2 className="text-lg font-bold">{employee.name} · {employee.code}</h2><div className="flex flex-wrap gap-4"><label>Phạm vi<select className="field" value={scope} onChange={e=>{setScope(e.target.value);setDate('');}}><option value="UPCOMING">Đang trực & Sắp tới</option><option value="ALL">Tất cả ngày trực</option></select></label><label>Tìm ngày cụ thể<input className="field" type="date" value={date} onChange={e=>setDate(e.target.value)}/></label>{date&&<button type="button" className="action secondary self-end" onClick={()=>setDate('')}>Bỏ lọc ngày</button>}</div><p role="status" className="text-sm text-slate-500">{rows.length} ca trực phù hợp · Tự cập nhật khi lịch thay đổi.</p></div>
+ {!rows.length&&<p className="panel">Không có ca trực trong phạm vi đã chọn.</p>}
+ <div className="grid gap-4 lg:grid-cols-2">{rows.map(({shift,positions})=><article key={shift.id} className="panel space-y-3"><div className="flex justify-between gap-3"><h3 className="font-bold text-lg">{formatDate(shift.date)}</h3>{shift.date===currentDutyDate&&<span className="text-sm text-emerald-700">Đang trực</span>}</div><p className="font-semibold text-indigo-700 dark:text-indigo-300">Vị trí: {positions.join(', ')}</p><p className="text-sm">07:00 ngày {formatDate(shift.date)} → 07:00 ngày {formatDate(dayOffset(shift.date,1))}</p><dl className="space-y-2 border-t pt-3">{dutyPositions.map(([key,label])=><div className="flex justify-between gap-3 text-sm" key={key}><dt className="text-slate-500">{label}</dt><dd className={shift[key]===chosenId?'font-bold text-right':'text-right'}>{names.get(shift[key]||'')||'Chưa phân công'}</dd></div>)}</dl>{shift.isLocked&&<p className="text-xs text-slate-500">Ca đã khóa</p>}</article>)}</div></>}
+ {!personal&&!employee&&<p className="panel text-slate-500">Chọn một nhân viên ở trên để xem các ca và ngày trực.</p>}
+ </section>;
+}

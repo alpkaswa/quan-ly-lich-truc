@@ -1,0 +1,5 @@
+{
+ "folders":[{"path":"."}],
+ "settings":{"files.exclude":{"**/.wrangler":true,"**/worker-build":true},"files.encoding":"utf8"},
+ "extensions":{"recommendations":["dbaeumer.vscode-eslint","bradlc.vscode-tailwindcss"]}
+}

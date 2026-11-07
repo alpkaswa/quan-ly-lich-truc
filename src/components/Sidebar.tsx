@@ -1,0 +1,17 @@
+import React from 'react';
+import {CalendarDays,Users,CalendarX2,BarChart3,Printer,Settings,RotateCcw,Home,Calendar,ShieldCheck,Database,CheckCircle2,Menu,ChevronDown} from 'lucide-react';
+import type {AppUserRole} from '../types';
+interface SidebarProps {currentTab:string;onSelectTab:(tab:string)=>void;currentUserRole:AppUserRole;pendingLeavesCount:number;pendingCompensatoryCount?:number;pendingSwapsCount?:number;conflictsCount:number;schoolName:string;onOpenSettings:()=>void;}
+const everyday=[{id:'dashboard',label:'Hôm nay & Ngày mai',icon:Home},{id:'my-duties',label:'Ca trực của tôi',icon:CalendarDays},{id:'schedule',label:'Lịch tháng',icon:CalendarDays},{id:'lookup',label:'Tìm ca trực',icon:Users},{id:'swaps',label:'Đổi ca & Lịch sử',icon:RotateCcw},{id:'leaves',label:'Lịch bận & Nghỉ phép',icon:CalendarX2},{id:'statistics',label:'Thống kê',icon:BarChart3},{id:'export',label:'In & Xuất lịch',icon:Printer}];
+const management=[{id:'auto-schedule',label:'Xếp lịch tự động',icon:Calendar},{id:'employees',label:'Nhân sự',icon:Users},{id:'compensatory',label:'Trực bù & Nợ ca',icon:RotateCcw},{id:'accounts',label:'Tài khoản nhân sự',icon:ShieldCheck},{id:'activity',label:'Nhật ký hoạt động',icon:CalendarDays},{id:'system',label:'Giám sát hệ thống',icon:BarChart3},{id:'backups',label:'Sao lưu & Khôi phục',icon:Database},{id:'overview',label:'Tổng quan quản lý',icon:BarChart3},{id:'tests',label:'Kiểm tra xếp lịch',icon:CheckCircle2}];
+export function Sidebar({currentTab,onSelectTab,currentUserRole,pendingLeavesCount,pendingCompensatoryCount=0,pendingSwapsCount=0,schoolName,onOpenSettings}:SidebarProps){
+ const [expanded,setExpanded]=React.useState(false);
+ const trigger=React.useRef<HTMLButtonElement>(null);
+ const activeLabel=[...everyday,...management].find(entry=>entry.id===currentTab)?.label || 'Điều hướng';
+ function closeMenu(){
+   setExpanded(false);
+   if(expanded && trigger.current?.offsetWidth)trigger.current.focus();
+ }
+ const item=(entry:typeof everyday[number])=>{const Icon=entry.icon;const count=entry.id==='leaves'?pendingLeavesCount:entry.id==='compensatory'?pendingCompensatoryCount:entry.id==='swaps'?pendingSwapsCount:0;return <button key={entry.id} data-nav-id={entry.id} aria-current={currentTab===entry.id?'page':undefined} onClick={()=>{closeMenu();onSelectTab(entry.id);}} className={`nav-item ${currentTab===entry.id?'is-active':''}`}><Icon size={18}/><span>{entry.label}</span>{count>0&&<span className="nav-count">{count}</span>}</button>;};
+ return <aside className="app-sidebar no-print" onKeyDown={e=>{if(e.key==='Escape' && expanded)closeMenu();}}><div className="sidebar-brand"><strong>Lịch trực nội trú</strong><p title={schoolName}>{schoolName||'Na Rì'}</p></div><button ref={trigger} type="button" className="mobile-nav-trigger" aria-controls="main-nav" aria-expanded={expanded} onClick={()=>setExpanded(!expanded)}><Menu size={20}/><strong>Menu</strong><span>{activeLabel}</span><ChevronDown size={18}/></button><nav id="main-nav" data-expanded={expanded} aria-label="Điều hướng chức năng"><p className="nav-group-label">Lịch trực</p><div className="everyday-nav">{everyday.map(item)}</div>{currentUserRole==='ADMIN'&&<details className="management-nav" open={management.some(e=>e.id===currentTab)}><summary>Quản lý</summary><div>{management.map(item)}<button className="nav-item" onClick={()=>{closeMenu();onOpenSettings();}}><Settings size={18}/><span>Cài đặt</span></button></div></details>}</nav></aside>;
+}

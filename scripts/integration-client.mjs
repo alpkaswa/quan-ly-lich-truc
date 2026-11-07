@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createServer} from 'vite';
+import WebSocket from 'ws';
+const fixture=JSON.parse(readFileSync('.wrangler/integration-20261103/sessions.json','utf8'));
+const base='http://127.0.0.1:8791',origin='http://localhost:3000';
+const u=fixture.users[10],cookie=`duty_session=${u.raw}; duty_csrf=${u.csrf}`;
+const realFetch=globalThis.fetch;
+globalThis.fetch=(url,options={})=>{if(typeof url==='string'&&url.startsWith('/api')){const headers=new Headers(options.headers);headers.set('Cookie',cookie);headers.set('Origin',origin);return realFetch(base+url,{...options,headers});}return realFetch(url,options);};
+globalThis.window=new EventTarget();globalThis.document=new EventTarget();document.visibilityState='visible';globalThis.location=new URL(origin);
+Object.defineProperty(globalThis,'navigator',{configurable:true,value:{onLine:true}});
+globalThis.WebSocket=class extends WebSocket{constructor(url){super(base.replace('http','ws')+new URL(url).pathname,{headers:{Origin:origin,Cookie:cookie}});}};
+const vite=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
+const {getSession}=await vite.ssrLoadModule('/src/services/api.ts');
+const {StorageService,storageEvents}=await vite.ssrLoadModule('/src/services/storage.ts');
+const waitFor=async(check)=>{const end=Date.now()+10000;while(Date.now()<end){if(check())return;await new Promise(r=>setTimeout(r,30));}assert.fail('Client sync timed out');};
+let connected=false,ready=false,stop;
+storageEvents.addEventListener('connection',event=>{connected=event.detail;});storageEvents.addEventListener('ready',()=>{ready=true;});
+try{
+ await getSession();stop=StorageService.listen(false);await waitFor(()=>connected&&ready);console.log('PASS real client adapter initially loads and connects');
+ navigator.onLine=false;window.dispatchEvent(new Event('offline'));await waitFor(()=>!connected);console.log('PASS client reports network loss');
+ const admin=fixture.users[0],headers={Origin:origin,Cookie:`duty_session=${admin.raw}; duty_csrf=${admin.csrf}`,'X-CSRF-Token':admin.csrf,'Content-Type':'application/json'};
+ const state=await realFetch(base+'/api/state',{headers}).then(r=>r.json());state.data.settings.schoolName='Offline reconnect integration '+Date.now();
+ const response=await realFetch(base+'/api/state',{method:'PUT',headers,body:JSON.stringify({expectedRevision:state.revision,data:state.data})});assert.equal(response.status,200);
+ assert.notEqual(StorageService.getSettings().schoolName,state.data.settings.schoolName);console.log('PASS disconnected device keeps previous snapshot');
+ navigator.onLine=true;window.dispatchEvent(new Event('online'));await waitFor(()=>connected&&StorageService.getSettings().schoolName===state.data.settings.schoolName);console.log('PASS client reconnects and reads actual latest D1 state without page reload');
+ const initial=StorageService.getEmployees().length;StorageService.saveEmployees([]);assert.equal(StorageService.getEmployees().length,initial);console.log('PASS employee adapter cannot stage Admin writes');
+ let ended=false;window.addEventListener('session-ended',()=>{ended=true;});
+ const lock=await realFetch(base+'/api/accounts/active',{method:'POST',headers,body:JSON.stringify({uid:u.id,active:false})});assert.equal(lock.status,200);await waitFor(()=>ended);console.log('PASS real client handles revocation immediately without waiting for socket shutdown');
+ console.log(JSON.stringify({realClientAdapter:'PASS',checks:6,productionDataTouched:false}));
+}finally{stop?.();await vite.close();globalThis.fetch=realFetch;}

@@ -1,0 +1,9 @@
+{
+ "version":"2.0.0",
+ "tasks":[
+  {"label":"Kiểm tra toàn bộ","type":"npm","script":"check","group":{"kind":"test","isDefault":true},"problemMatcher":[]},
+  {"label":"Mở giao diện để sửa","type":"npm","script":"dev","isBackground":true,"problemMatcher":[]},
+  {"label":"Chạy máy chủ cục bộ","type":"npm","script":"api:dev","isBackground":true,"problemMatcher":[]},
+  {"label":"Tạo bản phát hành","type":"npm","script":"build","group":{"kind":"build","isDefault":true},"problemMatcher":[]}
+ ]
+}

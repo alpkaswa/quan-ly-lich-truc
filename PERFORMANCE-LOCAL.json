@@ -1,0 +1,528 @@
+{
+  "environment": "local workerd/D1, not production",
+  "at": "2026-11-05T01:31:48.121Z",
+  "timings": [
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 401,
+      "ms": 35
+    },
+    {
+      "method": "PUT",
+      "path": "/state",
+      "status": 403,
+      "ms": 22
+    },
+    {
+      "method": "GET",
+      "path": "/accounts",
+      "status": 403,
+      "ms": 22
+    },
+    {
+      "method": "POST",
+      "path": "/leaves",
+      "status": 403,
+      "ms": 11
+    },
+    {
+      "method": "POST",
+      "path": "/leaves",
+      "status": 403,
+      "ms": 7
+    },
+    {
+      "method": "GET",
+      "path": "/auth/session",
+      "status": 403,
+      "ms": 10
+    },
+    {
+      "method": "GET",
+      "path": "/auth/session",
+      "status": 403,
+      "ms": 13
+    },
+    {
+      "method": "POST",
+      "path": "/leaves",
+      "status": 400,
+      "ms": 23
+    },
+    {
+      "method": "GET",
+      "path": "/auth/session",
+      "status": 200,
+      "ms": 31
+    },
+    {
+      "method": "GET",
+      "path": "/leaves",
+      "status": 200,
+      "ms": 30
+    },
+    {
+      "method": "GET",
+      "path": "/leaves",
+      "status": 200,
+      "ms": 21
+    },
+    {
+      "method": "POST",
+      "path": "/swaps",
+      "status": 400,
+      "ms": 30
+    },
+    {
+      "method": "POST",
+      "path": "/leaves",
+      "status": 200,
+      "ms": 114
+    },
+    {
+      "method": "GET",
+      "path": "/leaves",
+      "status": 200,
+      "ms": 20
+    },
+    {
+      "method": "POST",
+      "path": "/leaves/withdraw",
+      "status": 403,
+      "ms": 23
+    },
+    {
+      "method": "POST",
+      "path": "/leaves/respond",
+      "status": 403,
+      "ms": 21
+    },
+    {
+      "method": "POST",
+      "path": "/leaves",
+      "status": 400,
+      "ms": 31
+    },
+    {
+      "method": "POST",
+      "path": "/leaves/withdraw",
+      "status": 200,
+      "ms": 32
+    },
+    {
+      "method": "POST",
+      "path": "/swaps",
+      "status": 200,
+      "ms": 37
+    },
+    {
+      "method": "POST",
+      "path": "/swaps/respond",
+      "status": 403,
+      "ms": 31
+    },
+    {
+      "method": "POST",
+      "path": "/swaps/respond",
+      "status": 200,
+      "ms": 36
+    },
+    {
+      "method": "POST",
+      "path": "/swaps/respond",
+      "status": 409,
+      "ms": 59
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 26
+    },
+    {
+      "method": "POST",
+      "path": "/swaps",
+      "status": 200,
+      "ms": 33
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 27
+    },
+    {
+      "method": "POST",
+      "path": "/swaps/respond",
+      "status": 200,
+      "ms": 32
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 30
+    },
+    {
+      "method": "PUT",
+      "path": "/state",
+      "status": 200,
+      "ms": 41
+    },
+    {
+      "method": "PUT",
+      "path": "/state",
+      "status": 409,
+      "ms": 43
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 25
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 18
+    },
+    {
+      "method": "PUT",
+      "path": "/state",
+      "status": 200,
+      "ms": 39
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 26
+    },
+    {
+      "method": "POST",
+      "path": "/backups",
+      "status": 200,
+      "ms": 41
+    },
+    {
+      "method": "GET",
+      "path": "/backups/download?id=4c6e9e70-9806-4af1-837a-06ab8f8789ab",
+      "status": 200,
+      "ms": 18
+    },
+    {
+      "method": "GET",
+      "path": "/backups",
+      "status": 403,
+      "ms": 19
+    },
+    {
+      "method": "POST",
+      "path": "/accounts/active",
+      "status": 200,
+      "ms": 27
+    },
+    {
+      "method": "GET",
+      "path": "/auth/session",
+      "status": 401,
+      "ms": 7
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 66
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 66
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 80
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1088
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1088
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1089
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1089
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1089
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1089
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1089
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1089
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1090
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1090
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1090
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1090
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1094
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1094
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1094
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1094
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1094
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1095
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1095
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1095
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1095
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1095
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1097
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1097
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1097
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1097
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1097
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1098
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1099
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1099
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1101
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1100
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1100
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1100
+    },
+    {
+      "method": "GET",
+      "path": "/state",
+      "status": 200,
+      "ms": 1100
+    }
+  ]
+}

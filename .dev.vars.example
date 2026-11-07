@@ -1,0 +1,10 @@
+# Chỉ dùng cục bộ. Thay tất cả giá trị bằng chuỗi ngẫu nhiên riêng, ít nhất 64 ký tự hex.
+ALLOW_LOCAL_HTTP=true
+APP_ORIGIN=http://localhost:3000
+BOOTSTRAP_TOKEN=REPLACE_WITH_RANDOM_LOCAL_SECRET
+PASSWORD_PEPPER=REPLACE_WITH_RANDOM_LOCAL_SECRET
+BACKUP_SIGNING_KEY=REPLACE_WITH_RANDOM_LOCAL_SECRET
+
+# OAuth Web Client ID công khai; thêm http://localhost:3000 vào origin của Google.
+GOOGLE_CLIENT_ID=REPLACE_WITH_YOUR_WEB_CLIENT_ID.apps.googleusercontent.com
+ADMIN_GOOGLE_EMAIL=REPLACE_WITH_YOUR_ADMIN_EMAIL

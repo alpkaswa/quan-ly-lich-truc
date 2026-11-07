@@ -1,0 +1,88 @@
+{
+  "environment": "local workerd/D1 only",
+  "rawBytes": 14910901,
+  "fileBytes": 86900,
+  "largeAuditRowsPreserved": 100,
+  "tamperedRejected": true,
+  "legacyRestore": true,
+  "atomicRestore": true,
+  "safetyBackup": true,
+  "productionDataTouched": false,
+  "samples": [
+    {
+      "path": "/auth/password",
+      "ms": 101,
+      "status": 200
+    },
+    {
+      "path": "/state",
+      "ms": 19,
+      "status": 200
+    },
+    {
+      "path": "/backups",
+      "ms": 469,
+      "status": 200
+    },
+    {
+      "path": "/backups/download?id=d05fdb11-8510-472e-9ba0-741b057ee026",
+      "ms": 17,
+      "status": 200
+    },
+    {
+      "path": "/backups/restore",
+      "ms": 17,
+      "status": 400
+    },
+    {
+      "path": "/state",
+      "ms": 45,
+      "status": 200
+    },
+    {
+      "path": "/backups/restore",
+      "ms": 996,
+      "status": 200
+    },
+    {
+      "path": "/auth/session",
+      "ms": 8,
+      "status": 401
+    },
+    {
+      "path": "/auth/password",
+      "ms": 50,
+      "status": 200
+    },
+    {
+      "path": "/backups",
+      "ms": 412,
+      "status": 200
+    },
+    {
+      "path": "/backups/download?id=acf66e9d-bbd4-4670-b053-8dda286b13cc",
+      "ms": 16,
+      "status": 200
+    },
+    {
+      "path": "/state",
+      "ms": 18,
+      "status": 200
+    },
+    {
+      "path": "/backups/restore",
+      "ms": 652,
+      "status": 200
+    },
+    {
+      "path": "/auth/password",
+      "ms": 52,
+      "status": 200
+    },
+    {
+      "path": "/state",
+      "ms": 21,
+      "status": 200
+    }
+  ]
+}

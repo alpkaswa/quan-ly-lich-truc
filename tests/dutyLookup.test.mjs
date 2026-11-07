@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {stripTypeScriptTypes} from 'node:module';
+import {readFile} from 'node:fs/promises';
+const source=stripTypeScriptTypes(await readFile(new URL('../src/services/dutyLookup.ts',import.meta.url),'utf8'),{mode:'strip'});
+const {findDutyEmployees,dutiesForEmployee}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const employees=[{id:'a',name:'Đặng Minh Nghĩa',code:'GV01'},{id:'b',name:'Nguyễn Bảo',code:'BGH01'}];
+const shifts=[{id:'later',date:'2030-02-04',teacher1Id:'a',adminId:'b'},{id:'early',date:'2030-01-03',teacher2Id:'a'},{id:'other',date:'2030-01-06',guardId:'g'}];
+test('employee search supports Vietnamese without accents, codes and absent phone values',()=>{assert.equal(findDutyEmployees(employees,'dang minh nghia')[0].id,'a');assert.equal(findDutyEmployees(employees,'bgh01')[0].id,'b');assert.equal(findDutyEmployees(employees,'missing').length,0);});
+test('personal duties include only exact personnel identity, with correct positions sorted by date',()=>{const rows=dutiesForEmployee(shifts,'a');assert.deepEqual(rows.map(r=>r.shift.id),['early','later']);assert.deepEqual(rows[0].positions,['Giáo viên 2']);assert.deepEqual(dutiesForEmployee(shifts,'b')[0].positions,['Ban giám hiệu']);assert.equal(dutiesForEmployee(shifts,null).length,0);});
+test('date and upcoming filters return matching duties without mutating shared roster',()=>{const before=structuredClone(shifts);assert.equal(dutiesForEmployee(shifts,'a',{date:'2030-02-04'}).length,1);assert.equal(dutiesForEmployee(shifts,'a',{fromDate:'2030-01-04'})[0].shift.id,'later');assert.deepEqual(shifts,before);});

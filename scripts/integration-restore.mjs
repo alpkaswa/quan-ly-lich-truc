@@ -1,0 +1,21 @@
+// Destructive restore test is confined to the isolated LOCAL database on port 8791.
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {verifyBackup} from '../worker/backup.mjs';
+const key=readFileSync('.dev.vars','utf8').match(/^BACKUP_SIGNING_KEY=(.+)$/m)[1].trim().replace(/^['"]|['"]$/g,'');
+const {users}=JSON.parse(readFileSync('.wrangler/integration-20261103/sessions.json','utf8'));
+const u=users[0],base='http://127.0.0.1:8791/api';
+const headers={Origin:'http://localhost:3000',Cookie:`duty_session=${u.raw}; duty_csrf=${u.csrf}`,'X-CSRF-Token':u.csrf,'Content-Type':'application/json'};
+const request=async(path,method='GET',data)=>{const r=await fetch(base+path,{method,headers,body:data===undefined?undefined:JSON.stringify(data),signal:AbortSignal.timeout(15000)});return {status:r.status,data:await r.json()};};
+const saved=(await request('/state')).data;
+const created=await request('/backups','POST',{});assert.equal(created.status,200);
+const config=await request('/backups/config');console.log('Local backup storage:',config.data.storage);
+const backup=(await request('/backups/download?id='+created.data.id)).data;
+assert.ok(Array.isArray((await verifyBackup({BACKUP_SIGNING_KEY:key},backup)).tables.login_history));console.log('PASS login history included in signed backup');
+const tampered={...backup,body:backup.body+' '};
+assert.equal((await request('/backups/restore','POST',{confirm:'KHOI PHUC',backup:tampered})).status,400);console.log('PASS altered signed backup rejected');
+assert.equal((await request('/state')).data.revision,saved.revision);console.log('PASS rejected restore leaves current data unchanged');
+const changed=structuredClone(saved.data);changed.settings.schoolName='LOCAL RESTORE TEST CHANGE';assert.equal((await request('/state','PUT',{expectedRevision:saved.revision,data:changed})).status,200);
+const result=await request('/backups/restore','POST',{confirm:'KHOI PHUC',backup});assert.equal(result.status,200);assert.equal(result.data.success,true);assert.ok(result.data.safetyBackup);console.log('PASS signed backup restores atomically and creates safety backup');
+assert.equal((await request('/auth/session')).status,401);console.log('PASS restore invalidates previous authenticated sessions');
+console.log(JSON.stringify({localRestore:'PASS',checks:4,productionDataTouched:false}));
