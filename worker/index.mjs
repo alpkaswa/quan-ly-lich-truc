@@ -244,9 +244,13 @@ async function route(request,env,ctx) {
       if(linked){u=linked;if(!u.active)error('Tài khoản đã bị khóa.',403);}
       else {
         // Only the deployment-controlled, verified owner email can link the initial Admin.
-        const owner=identity.email===String(env.ADMIN_GOOGLE_EMAIL||'').toLowerCase();
+        const owner=String(env.ADMIN_GOOGLE_EMAIL||'').toLowerCase().split(',').map(s=>s.trim()).includes(identity.email);
         const existing=owner?await query(env.DB,"SELECT u.* FROM users u LEFT JOIN google_identities gi ON gi.user_id=u.id WHERE u.role='ADMIN' AND gi.id IS NULL ORDER BY u.created_at LIMIT 1").first():null;
         if(existing){u=existing;if(!u.active)error('Tài khoản đã bị khóa.',403);}
+        else if(owner){
+          u={id:randomUUID(),username:`google-${identity.sub}`,display_name:identity.name,password_hash:'GOOGLE_ONLY',role:'ADMIN',employee_id:null,active:1,created_at:nowISO()};
+          sql.push(query(env.DB,'INSERT INTO users(id,username,display_name,password_hash,role,employee_id,active,created_at) VALUES (?,?,?,?,?,?,?,?)',u.id,u.username,u.display_name,u.password_hash,u.role,u.employee_id,u.active,u.created_at));
+        }
         else {
           const allowed=(await query(env.DB,"SELECT e.id FROM employees e WHERE e.active=1 AND lower(trim(json_extract(e.payload,'$.email')))=? ",identity.email).all()).results;
           requireGoogleProvisioning(allowed);
