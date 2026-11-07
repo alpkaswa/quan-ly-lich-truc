@@ -33,34 +33,46 @@ export class StorageService {
         serverConfirmed=true;
       }while(dirty);
     })();
-    try{await refreshing;}catch(e){serverConfirmed=false;emitStorage('connection',false);emitStorage('failure',(e as Error).message);throw e;}finally{refreshing=null;}
+    try{await refreshing;emitStorage('connection',true);}catch(e){serverConfirmed=false;emitStorage('connection',false);emitStorage('failure',(e as Error).message);throw e;}finally{refreshing=null;}
   }
   static listen(admin:boolean){
     this.clear();canWrite=admin;const current=generation;
-    let stopped=false,socket:WebSocket|null=null,retryTimer:ReturnType<typeof setTimeout>|undefined,heartbeat:ReturnType<typeof setInterval>|undefined;
+    let stopped=false,socket:WebSocket|null=null,retryTimer:ReturnType<typeof setTimeout>|undefined,heartbeat:ReturnType<typeof setInterval>|undefined,pollTimer:ReturnType<typeof setInterval>|undefined;
     let attempts=0,lastPong=Date.now();
     const refresh=()=>void this.refresh().catch(()=>{});
     const connect=()=>{
       if(stopped||current!==generation||!navigator.onLine)return;
       if(socket){socket.onclose=null;socket.close();}
-      const url=new URL('/api/ws',location.href);url.protocol=location.protocol==='https:'?'wss:':'ws:';
-      socket=new WebSocket(url);
-      socket.onopen=()=>{attempts=0;lastPong=Date.now();emitStorage('connection',true);refresh();};
-      socket.onmessage=e=>{if(e.data==='pong'){lastPong=Date.now();return;}try{const event=JSON.parse(e.data);if(event.type==='session-ended'){stopped=true;clearTimeout(retryTimer);clearInterval(heartbeat);serverConfirmed=false;emitStorage('connection',false);window.dispatchEvent(new Event('session-ended'));socket?.close();return;}if(event.type==='changed'&&(!Number.isSafeInteger(event.revision)||event.revision>revision))refresh();}catch{socket?.close();}};
-      socket.onerror=()=>{serverConfirmed=false;emitStorage('connection',false);};
+      try{
+        const url=new URL('/api/ws',location.href);url.protocol=location.protocol==='https:'?'wss:':'ws:';
+        socket=new WebSocket(url);
+      }catch{
+        if(!pollTimer)pollTimer=setInterval(refresh,8000);
+        return;
+      }
+      socket.onopen=()=>{
+        attempts=0;lastPong=Date.now();
+        if(pollTimer){clearInterval(pollTimer);pollTimer=undefined;}
+        emitStorage('connection',true);
+        refresh();
+      };
+      socket.onmessage=e=>{if(e.data==='pong'){lastPong=Date.now();return;}try{const event=JSON.parse(e.data);if(event.type==='session-ended'){stopped=true;clearTimeout(retryTimer);clearInterval(heartbeat);if(pollTimer)clearInterval(pollTimer);serverConfirmed=false;emitStorage('connection',false);window.dispatchEvent(new Event('session-ended'));socket?.close();return;}if(event.type==='changed'&&(!Number.isSafeInteger(event.revision)||event.revision>revision))refresh();}catch{socket?.close();}};
+      socket.onerror=()=>{
+        if(!pollTimer)pollTimer=setInterval(refresh,8000);
+      };
       socket.onclose=e=>{
-        serverConfirmed=false;emitStorage('connection',false);
-        if(e.code===4001){stopped=true;clearTimeout(retryTimer);clearInterval(heartbeat);window.dispatchEvent(new Event('session-ended'));return;}
+        if(e.code===4001){stopped=true;clearTimeout(retryTimer);clearInterval(heartbeat);if(pollTimer)clearInterval(pollTimer);window.dispatchEvent(new Event('session-ended'));return;}
+        if(!pollTimer)pollTimer=setInterval(refresh,8000);
         if(!stopped){clearTimeout(retryTimer);retryTimer=setTimeout(connect,Math.min(30000,1000*2**attempts++)+Math.random()*400);}
       };
     };
-    const online=()=>{clearTimeout(retryTimer);connect();};
+    const online=()=>{clearTimeout(retryTimer);connect();refresh();};
     const offline=()=>{serverConfirmed=false;emitStorage('connection',false);socket?.close();};
     const focus=()=>{if(document.visibilityState==='visible'){refresh();if(!socket||socket.readyState!==WebSocket.OPEN)online();}};
     window.addEventListener('online',online);window.addEventListener('offline',offline);document.addEventListener('visibilitychange',focus);
     heartbeat=setInterval(()=>{if(socket?.readyState===WebSocket.OPEN){if(Date.now()-lastPong>65000)socket.close();else socket.send('ping');}},25000);
     connect();refresh();
-    return()=>{stopped=true;clearTimeout(retryTimer);clearInterval(heartbeat);if(socket){socket.onclose=null;socket.close();}window.removeEventListener('online',online);window.removeEventListener('offline',offline);document.removeEventListener('visibilitychange',focus);if(current===generation)this.clear();};
+    return()=>{stopped=true;clearTimeout(retryTimer);clearInterval(heartbeat);if(pollTimer)clearInterval(pollTimer);if(socket){socket.onclose=null;socket.close();}window.removeEventListener('online',online);window.removeEventListener('offline',offline);document.removeEventListener('visibilitychange',focus);if(current===generation)this.clear();};
   }
   static async reconnect(){await this.refresh();}
   private static stage<K extends keyof SharedData>(key:K,value:SharedData[K]){
